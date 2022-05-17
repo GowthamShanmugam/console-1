@@ -30,6 +30,7 @@ In the case of 4.10+ we will install addition [resources](https://github.com/ope
 
 From the root of the `console` repository run:
 ```
+yarn build:plugins
 npm run plugins
 ```
 
