@@ -30,14 +30,11 @@ In the case of 4.10+ we will install addition [resources](https://github.com/ope
 ```
 git clone https://github.com/stolostron/console.git
 ```
-```
-Makesure you have logged in to the OCP cluster where ACM is installed on local using "OC login"
-```
-
 ### Running console as OCP dynamic plugins
 
 From the root of the `console` repository run: (Run this command everytime when you use new OCP cluster)
 ```
+Makesure you have logged in to the OCP cluster where ACM is installed on local using "OC login"
 ./setup.sh
 yarn build:plugins
 npm run plugins
