@@ -36,7 +36,7 @@ Makesure you have logged in to the OCP cluster where ACM is installed on local u
 
 ### Running console as OCP dynamic plugins
 
-From the root of the `console` repository run:
+From the root of the `console` repository run: (Run this command everytime when you use new OCP cluster)
 ```
 ./setup.sh
 yarn build:plugins
