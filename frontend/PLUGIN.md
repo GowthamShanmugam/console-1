@@ -13,6 +13,27 @@ and has extensions indicating how and where that "dynamic plugin" will be loaded
 
 In addition the OCP console provides dynamic [proxies]((https://github.com/openshift/console/tree/master/frontend/packages/console-dynamic-plugin-sdk) that allow those loaded conponents to communicate with the backends even in other namespaces.
 
+# OCP Console
+Enable hybrid console by following the steps:
+
+### Revert the following commit
+```
+https://github.com/openshift/console/pull/11102
+```
+
+### Build console backend
+```
+./build.sh
+```
+
+### Everytime you try to setup hybrid console on a new OCP cluster follow these steps on the OCP console root directory
+```
+rm -rf multicluster.config
+export KUBECONFIG=multicluster.config
+"oc login" with OCP cluster, if you have spoke clusters then do "oc login" on all the clusters.(multicluster.config will keep record the all cluster info)
+source contrib/multicluster-environment.sh 
+```
+
 ## ACM Dynamic Plugins
 
 ACM will run stand-alone as it needs to support back to OCP 4.6 and dynamic plugins are only available in OCP 4.10+.
@@ -26,10 +47,17 @@ In the case of 4.10+ we will install addition [resources](https://github.com/ope
 
 ## Development
 
+### Clone the repo to local
+```
+git clone https://github.com/stolostron/console.git
+```
+### Makesure you have logged in to the OCP cluster where ACM is installed on local using "OC login"
+
 ### Running console as OCP dynamic plugins
 
 From the root of the `console` repository run:
 ```
+./setup.sh
 yarn build:plugins
 npm run plugins
 ```
