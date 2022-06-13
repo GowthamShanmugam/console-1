@@ -31,6 +31,7 @@ INSTALLATION_NAMESPACE=`oc get multiclusterhub -A -o jsonpath='{.items[0].metada
 SA_SECRET=$(oc get serviceaccounts -n $INSTALLATION_NAMESPACE --selector=app=console-chart,component=serviceaccount -o json | jq -r '.items[0].secrets[] | select (.name | test("-token-")).name')
 SA_TOKEN=`oc get secret -n $INSTALLATION_NAMESPACE ${SA_SECRET} -o="jsonpath={.data.token}"`
 
+echo $SA_SECRET
 echo ${SA_TOKEN} > /tmp/tmp_SA_TOKEN
 SA_TOKEN=`cat /tmp/tmp_SA_TOKEN | base64 -d -`
 rm /tmp/tmp_SA_TOKEN

@@ -6,7 +6,7 @@ import { cellWidth } from '@patternfly/react-table'
 import { AcmDropdown, AcmEmptyState, AcmTable, IAcmRowAction, IAcmTableColumn } from '@stolostron/ui-components'
 import { TFunction } from 'i18next'
 import _ from 'lodash'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useContext } from 'react'
 import { useHistory } from 'react-router'
 import { Link } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
@@ -61,6 +61,7 @@ import {
     isResourceTypeOf,
 } from './helpers/resource-helper'
 import { isLocalSubscription } from './helpers/subscriptions'
+import { PluginContext } from '../../lib/PluginContext'
 
 const gitBranchAnnotationStr = 'apps.open-cluster-management.io/git-branch'
 const gitPathAnnotationStr = 'apps.open-cluster-management.io/git-path'
@@ -183,6 +184,7 @@ export default function ApplicationsOverview() {
     const [channels] = useRecoilState(channelsState)
     const [placementRules] = useRecoilState(placementRulesState)
     const [namespaces] = useRecoilState(namespacesState)
+    const { applicationActionExtensions } = useContext(PluginContext)
 
     const allClusters = useAllClusters()
     const managedClusters = useMemo(
@@ -548,6 +550,18 @@ export default function ApplicationsOverview() {
                         )
                     },
                 })
+                if(applicationActionExtensions.length > 0) {
+                    applicationActionExtensions.every((applicationActionExtension) => {
+                        actions.push({
+                            id: "Custom Externsion",
+                            title: applicationActionExtension?.properties?.label,
+                            click: () => {
+                                applicationActionExtension?.properties?.component()
+                            },
+                        })
+                    })
+                }
+    
             }
 
             if (isResourceTypeOf(resource, ApplicationSetDefinition)) {

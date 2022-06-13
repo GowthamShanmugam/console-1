@@ -3,6 +3,8 @@ import { isHrefNavItem, useResolvedExtensions } from '@openshift-console/dynamic
 import { AcmTablePaginationContextProvider, AcmToastGroup, AcmToastProvider } from '@stolostron/ui-components'
 import { ReactNode, useCallback, useMemo } from 'react'
 import { PluginContext } from '../lib/PluginContext'
+import { isApplicationActionProps } from '../../extensions/application-action'
+
 
 export function PluginContextProvider(props: { children?: ReactNode }) {
     const [hrefs] = useResolvedExtensions(isHrefNavItem)
@@ -21,6 +23,8 @@ export function PluginContextProvider(props: { children?: ReactNode }) {
     const isACMAvailable = isOverviewAvailable
     const isSubmarinerAvailable = isOverviewAvailable
 
+    const [applicationActionExtensions] = useResolvedExtensions(isApplicationActionProps)
+
     return (
         <PluginContext.Provider
             value={{
@@ -30,6 +34,8 @@ export function PluginContextProvider(props: { children?: ReactNode }) {
                 isGovernanceAvailable,
                 isSearchAvailable,
                 isSubmarinerAvailable,
+                applicationActionExtensions
+
             }}
         >
             <div style={{ position: 'relative', height: '100%', width: '100%' }}>
