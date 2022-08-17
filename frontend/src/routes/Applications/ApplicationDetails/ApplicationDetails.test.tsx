@@ -51,6 +51,10 @@ import { waitForText } from '../../../lib/test-util'
 import ApplicationDetailsPage from './ApplicationDetails'
 import { GetMessagesDocument, SearchSchemaDocument } from '../../Home/Search/search-sdk/search-sdk'
 import { MockedProvider } from '@apollo/client/testing'
+import userEvent from '@testing-library/user-event'
+import { PluginContext } from '../../../lib/PluginContext'
+import { AcmExtension } from '../../../plugin-extensions/types'
+import { ApplicationActionProps } from '../../../plugin-extensions/properties'
 
 const mockApplication0: Application = {
     apiVersion: ApplicationApiVersion,
@@ -312,6 +316,29 @@ const mockFluxApplication0: OCPAppResource = {
     status: {
         cluster: 'test-cluster',
     },
+}
+
+const applicationActionProps: ApplicationActionProps[] = [
+    {
+        id: 'action1',
+        title: 'Action1',
+        model: [
+            {
+                apiVersion: 'app.k8s.io/v1beta1',
+                kind: 'Application',
+            },
+        ],
+        component: () => <>Action1</>,
+    },
+    {
+        id: 'action2',
+        title: 'Action2',
+        component: () => <>Action2</>,
+    },
+]
+
+const acmExtension: AcmExtension = {
+    applicationAction: applicationActionProps,
 }
 
 const mockApplications: Application[] = [mockApplication0]
@@ -639,7 +666,9 @@ describe('Applications Page', () => {
             >
                 <MemoryRouter>
                     <MockedProvider mocks={mocks}>
-                        <ApplicationDetailsPage {...props} />
+                        <PluginContext.Provider value={{ acmExtensions: acmExtension }}>
+                            <ApplicationDetailsPage {...props} />
+                        </PluginContext.Provider>
                     </MockedProvider>
                 </MemoryRouter>
             </RecoilRoot>
@@ -652,5 +681,8 @@ describe('Applications Page', () => {
         expect(screen.getByText('Overview')).toBeTruthy()
         expect(screen.getByText('Topology')).toBeTruthy()
         expect(screen.getByText('Actions')).toBeTruthy()
+        userEvent.click(screen.getByText('Actions'))
+        userEvent.click(screen.getByText('Action1'))
+        expect(screen.getByText('Action1')).toBeTruthy()
     })
 })
