@@ -10,7 +10,7 @@ oc get oauthclient console-oauth-client -o jsonpath='{.secret}' > ocp-console/co
 oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
     jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ocp-console/ca.crt
 
-CONSOLE_VERSION=${CONSOLE_VERSION:=4.12}
+CONSOLE_VERSION=${CONSOLE_VERSION:=4.16}
 CONSOLE_PORT=${CONSOLE_PORT:=9000}
 CONSOLE_IMAGE="quay.io/openshift/origin-console:${CONSOLE_VERSION}"
 
@@ -51,14 +51,14 @@ echo "Console URL: http://localhost:${CONSOLE_PORT}"
 if [ -x "$(command -v podman)" ]; then
     if [ "$(uname -s)" = "Linux" ]; then
         # Use host networking on Linux since host.containers.internal is unreachable in some environments.
-        BRIDGE_PLUGINS="mce=http://localhost:3001,acm=http://localhost:3002"
+        BRIDGE_PLUGINS="mce=http://localhost:3001,acm=http://localhost:3002,odf-multicluster-console=http://localhost:9001"
 
         podman run \
           -v $PWD/ocp-console/console-client-secret:/tmp/console-client-secret:Z \
           -v $PWD/ocp-console/ca.crt:/tmp/ca.crt:Z \
           --pull always \
           --rm --network=host \
-          --env BRIDGE_PLUGIN_PROXY='{"services": [{"consoleAPIPath": "/api/proxy/plugin/mce/console/", "endpoint":"https://localhost:4000","authorize":true}, {"consoleAPIPath": "/api/proxy/plugin/acm/console/", "endpoint":"https://localhost:4000","authorize":true}]}' \
+          --env BRIDGE_PLUGIN_PROXY='{"services": [{"consoleAPIPath": "/api/proxy/plugin/mce/console/", "endpoint":"https://localhost:4000","authorize":true}, {"consoleAPIPath": "/api/proxy/plugin/acm/console/", "endpoint":"https://localhost:4000","authorize":true}, {"consoleAPIPath": "/acm-thanos-querier/","endpoint":"http://thanos-open-cluster-management-observability.apps.drcluster2-mar-12-24.devcluster.openshift.com"}]}' \
           --env-file <(set | grep BRIDGE) \
           $CONSOLE_IMAGE
     else

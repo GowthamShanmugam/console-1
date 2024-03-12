@@ -180,6 +180,7 @@ module.exports = function (env: any, argv: { hot?: boolean; mode: string | undef
         publicPath: '/multicloud',
       },
       headers: {
+        'Cache-Control': 'no-store',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
       },
