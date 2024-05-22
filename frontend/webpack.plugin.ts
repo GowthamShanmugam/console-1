@@ -116,6 +116,7 @@ module.exports = function (env: any, argv: { hot?: boolean; mode: string | undef
       // Allow bridge running in a container to connect to the plugin dev server.
       allowedHosts: 'all',
       headers: {
+        'Cache-Control': 'no-store',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Authorization',

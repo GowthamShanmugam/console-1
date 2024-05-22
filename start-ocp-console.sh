@@ -7,10 +7,10 @@ oc process -f ocp-console-oauth-client.yaml | oc apply -f -
 
 oc get oauthclient console-oauth-client -o jsonpath='{.secret}' > ocp-console/console-client-secret
 
-oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
-    jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ocp-console/ca.crt
+oc get secrets -n multicluster-engine --field-selector type=kubernetes.io/service-account-token -o json | \
+    jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d > ocp-console/ca.crt
 
-CONSOLE_VERSION=${CONSOLE_VERSION:=4.13}
+CONSOLE_VERSION=${CONSOLE_VERSION:=4.16}
 CONSOLE_PORT=${CONSOLE_PORT:=9000}
 CONSOLE_IMAGE="quay.io/openshift/origin-console:${CONSOLE_VERSION}"
 
@@ -57,8 +57,8 @@ if [ -x "$(command -v podman)" ]; then
           -v $PWD/ocp-console/console-client-secret:/tmp/console-client-secret:Z \
           -v $PWD/ocp-console/ca.crt:/tmp/ca.crt:Z \
           --pull always \
-          --rm --network=host \
-          --env BRIDGE_PLUGIN_PROXY='{"services": [{"consoleAPIPath": "/api/proxy/plugin/mce/console/", "endpoint":"https://localhost:4000","authorize":true}, {"consoleAPIPath": "/api/proxy/plugin/acm/console/", "endpoint":"https://localhost:4000","authorize":true}]}' \
+          --rm --network=host \='{"services": [{"consoleAPIPath": "/api/proxy/plugin/mce/console/", "endpoint":"https://localhost:4000","authorize":true}, {"consoleAPIPath": "/api/proxy/plugin/acm/console/", "endpoint":"https://localhost:4000","authorize":true}]}' \
+          --env BRIDGE_PLUGIN_PROXY
           --env-file <(set | grep BRIDGE) \
           $CONSOLE_IMAGE
     else
@@ -74,7 +74,7 @@ if [ -x "$(command -v podman)" ]; then
           $CONSOLE_IMAGE
     fi
 else
-    BRIDGE_PLUGINS="mce=http://host.docker.internal:3001,acm=http://host.docker.internal:3002"
+    BRIDGE_PLUGINS="mce=http://host.docker.internal:3001,acm=http://host.docker.internal:3002,odf-multicluster-console=http://host.docker.internal:9001"
 
     docker run \
       -v $PWD/ocp-console/console-client-secret:/tmp/console-client-secret \
